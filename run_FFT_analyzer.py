@@ -1,6 +1,7 @@
 import argparse
 from src.stream_analyzer import Stream_Analyzer
 import time
+import serial
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -38,7 +39,7 @@ def run_FFT_analyzer():
                     updates_per_second  = 1000,  # How often to read the audio stream for new data
                     smoothing_length_ms = 50,    # Apply some temporal smoothing to reduce noisy features
                     n_frequency_bins = args.frequency_bins, # The FFT features are grouped in bins
-                    visualize = 1,               # Visualize the FFT features with PyGame
+                    visualize = 0,               # Visualize the FFT features with PyGame
                     verbose   = args.verbose,    # Print running statistics (latency, fps, ...)
                     height    = args.height,     # Height, in pixels, of the visualizer window,
                     window_ratio = window_ratio  # Float ratio of the visualizer window. e.g. 24/9
@@ -46,10 +47,33 @@ def run_FFT_analyzer():
 
     fps = 60  #How often to update the FFT features + display
     last_update = time.time()
+    #initialize serial port
+    #ser = serial.Serial('COM3', 9600)
+    
+    #write funtion to average an array
+    def average(array):
+        sum = 0
+        for i in range(len(array)):
+            sum += array[i]
+        return sum/len(array)
+
+
     while True:
         if (time.time() - last_update) > (1./fps):
             last_update = time.time()
             raw_fftx, raw_fft, binned_fftx, binned_fft = ear.get_audio_features()
+            low = binned_fft[0:100]
+            med = binned_fft[100:250]
+            high = binned_fft[250:400]
+
+            lave = int(average(low)*100)
+            mave = int(average(med)*100)
+            have = int(average(high)*100)
+            data = str(lave) + " " + str(mave) + " " + str(have)
+            print(str(lave) + " " + str(mave) + " " + str(have))
+            #ser.write(b'{}'.format(data))
+
+            
         elif args.sleep_between_frames:
             time.sleep(((1./fps)-(time.time()-last_update)) * 0.99)
 
