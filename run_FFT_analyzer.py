@@ -59,18 +59,62 @@ def run_FFT_analyzer():
 
 
     while True:
+        count = 0
+        LOW_POINT = 0
+        MED_POINT = 0
+        HIGH_POINT = 0
+        lave = [0]*30
+        mave = [0]*30
+        have = [0]*30
         if (time.time() - last_update) > (1./fps):
             last_update = time.time()
             raw_fftx, raw_fft, binned_fftx, binned_fft = ear.get_audio_features()
-            low = binned_fft[0:100]
-            med = binned_fft[100:250]
-            high = binned_fft[250:400]
+            low = binned_fft[0:50]
+            med = binned_fft[200:250]
+            high = binned_fft[350:400]
+            if(count < 5):
+                lave[count] = int(average(low)*100)
+                mave[count] = int(average(med)*100)
+                have[count] = int(average(high)*100)
+                count+= 1
+            else:
+                LOW_POINT = average(lave)
+                MED_POINT = average(mave)
+                HIGH_POINT = average(have)
+                count = 0
+            D_LOW = int(average(low)*100)-LOW_POINT
+            D_MED = int(average(med)*100)-MED_POINT
+            D_HIGH = int(average(high)*100)-HIGH_POINT
 
-            lave = int(average(low)*100)
-            mave = int(average(med)*100)
-            have = int(average(high)*100)
-            data = str(lave) + " " + str(mave) + " " + str(have)
-            print(str(lave) + " " + str(mave) + " " + str(have))
+           #if int(average(low)*100)> LOW_POINT:
+           #    D_LOW = 1
+           #else:
+           #    D_LOW = 0
+           #if int(average(med)*100)> MED_POINT:
+           #    D_MED = 1
+           #else:
+           #    D_MED = 0
+           #if int(average(high)*100)> HIGH_POINT:
+           #    D_HIGH = 1
+           #else:
+           #    D_HIGH = 0
+
+            if D_LOW > 10:
+               D_LOW = 1
+            else:
+               D_LOW = 0
+            if D_MED > 10:
+                D_MED = 1
+            else:
+                D_MED = 0
+            if D_HIGH > 10:
+                D_HIGH = 1
+            else:
+                D_HIGH = 0
+            
+                
+            #data = str(lave) + " " + str(mave) + " " + str(have)
+            print(str(D_LOW) + " " + str(D_MED) + " " + str(D_HIGH))
             #ser.write(b'{}'.format(data))
 
             
