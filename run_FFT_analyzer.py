@@ -39,7 +39,7 @@ def run_FFT_analyzer():
                     updates_per_second  = 1000,  # How often to read the audio stream for new data
                     smoothing_length_ms = 50,    # Apply some temporal smoothing to reduce noisy features
                     n_frequency_bins = args.frequency_bins, # The FFT features are grouped in bins
-                    visualize = 0,               # Visualize the FFT features with PyGame
+                    visualize = 1,               # Visualize the FFT features with PyGame
                     verbose   = args.verbose,    # Print running statistics (latency, fps, ...)
                     height    = args.height,     # Height, in pixels, of the visualizer window,
                     window_ratio = window_ratio  # Float ratio of the visualizer window. e.g. 24/9
@@ -48,7 +48,7 @@ def run_FFT_analyzer():
     fps = 60  #How often to update the FFT features + display
     last_update = time.time()
     #initialize serial port
-    #ser = serial.Serial('COM3', 9600)
+    ser = serial.Serial('COM7', 9600)
     
     #write funtion to average an array
     def average(array):
@@ -100,22 +100,24 @@ def run_FFT_analyzer():
            #    D_HIGH = 0
 
             if D_LOW > 10:
-               D_LOW = 1
+               D_LOW = b'1'
             else:
-               D_LOW = 0
+               D_LOW = b'0'
             if D_MED > 10:
-                D_MED = 1
+                D_MED = b'1'
             else:
-                D_MED = 0
+                D_MED = b'0'
             if D_HIGH > 10:
-                D_HIGH = 1
+                D_HIGH = b'1'
             else:
-                D_HIGH = 0
+                D_HIGH = b'0'
             
                 
-            #data = str(lave) + " " + str(mave) + " " + str(have)
+            data = str(D_LOW) + str(D_MED) + str(D_HIGH)
             print(str(D_LOW) + " " + str(D_MED) + " " + str(D_HIGH))
-            #ser.write(b'{}'.format(data))
+            ser.write(D_LOW)
+            ser.write(D_MED)
+            ser.write(D_HIGH)
 
             
         elif args.sleep_between_frames:
